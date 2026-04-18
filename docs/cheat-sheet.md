@@ -43,6 +43,7 @@ docker compose exec router bash
 - `check-self` -> hostname, interfaces, routes, listeners, DNS
 - `check-router` -> gateway path + router DNS check
 - `check-brain` -> DNS + route + TCP probe to `brain:9000`
+- `debug-flow` -> packet-flow checklist: interface, route, gateway, DNS, `iptables`
 - `sniff-brain` -> focused `tcpdump` capture for `brain`
 - `sniff-9000` -> focused `tcpdump` capture for TCP/9000
 - `demo-reset` -> zero router `FORWARD` counters on `router`
@@ -62,6 +63,25 @@ docker compose exec router bash
 - `nc`
 
 ## Quick Checks
+
+## Packet-Flow Order
+
+1. interface
+   Comment: is the source on the subnet you think it is?
+2. route
+   Comment: is the destination local, or does it need the router?
+3. gateway
+   Comment: can the next hop be reached on the local segment?
+4. DNS
+   Comment: does the name resolve to the IP you expect?
+5. `iptables`
+   Comment: after the path is clear, check whether policy blocks the traffic.
+
+Helper:
+
+```bash
+debug-flow brain
+```
 
 ### 1. Interfaces
 

@@ -157,6 +157,7 @@ It also includes a few task-oriented helpers for demos:
 - `check-self` -> show hostname, interfaces, routes, listeners, and DNS
 - `check-router` -> verify the lab gateway path and router-hosted DNS
 - `check-brain` -> resolve `brain`, show the route, and do a TCP probe to port `9000`
+- `debug-flow` -> walk the troubleshooting comments in packet-flow order: interface, route, gateway, DNS, then `iptables`
 - `sniff-brain` -> run `tcpdump` focused on traffic to `brain`
 - `sniff-9000` -> run `tcpdump` focused on TCP port `9000`
 - `demo-reset` -> on `router`, zero the `FORWARD` counters for a clean demo start; on nodes, print a local reset reminder and state summary
@@ -165,6 +166,29 @@ It also includes a few task-oriented helpers for demos:
 For reachability demos, `fping` is also installed in every container.
 For packet capture demos, `tcpdump` is also installed in every container.
 For layer-2 neighbor discovery demos, `arp-scan` is also installed in every container.
+
+### Packet-Flow Debug Order
+
+When you debug a connectivity issue in this lab, follow the packet in this order:
+
+1. `interface`
+   Comment: confirm the source container is on the interface and subnet you expect.
+2. `route`
+   Comment: decide whether the destination is local or remote, and identify the next hop.
+3. `gateway`
+   Comment: if the route uses a gateway, confirm that next hop is reachable on the local segment.
+4. `dns`
+   Comment: if you are using hostnames, prove name resolution before blaming transport.
+5. `iptables`
+   Comment: only after the path is clear should you decide whether firewall policy is the blocker.
+
+You can run the helper directly:
+
+```bash
+debug-flow brain
+```
+
+On `router`, `debug-flow` shows the same sequence from the forwarding point of view and ends on the `FORWARD` rules.
 
 ### 1. Check Interface Configuration
 

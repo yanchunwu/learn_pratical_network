@@ -9,6 +9,16 @@ if [ -n "${BASH_VERSION:-}" ]; then
     printf '\n== %s ==\n' "$1"
   }
 
+  target_ip() {
+    case "$1" in
+      brain) printf '172.20.0.11\n' ;;
+      left_arm|left-arm) printf '172.21.0.11\n' ;;
+      right_arm|right-arm) printf '172.21.0.12\n' ;;
+      router) printf '172.21.0.254\n' ;;
+      *) printf '%s\n' "$1" ;;
+    esac
+  }
+
   check-self() {
     net_header "hostname"
     hostname
@@ -35,6 +45,36 @@ if [ -n "${BASH_VERSION:-}" ]; then
     ip route get 172.20.0.11
     net_header "tcp probe to brain:9000"
     printf 'hello\n' | nc -w 2 brain 9000
+  }
+
+  debug-flow() {
+    local target="${1:-172.20.0.11}"
+    local target_addr
+
+    target_addr="$(target_ip "${target}")"
+
+    net_header "1. interface"
+    printf 'Comment: confirm which router interface owns each subnet.\n'
+    ip -brief addr
+
+    net_header "2. route"
+    printf 'Comment: confirm how the router will forward traffic toward the target.\n'
+    printf 'Target=%s TargetIP=%s\n' "${target}" "${target_addr}"
+    ip route get "${target_addr}" 2>/dev/null || printf 'Route lookup failed for %s\n' "${target_addr}"
+
+    net_header "3. gateway"
+    printf 'Comment: on the router, the gateway question becomes whether the packet arrived on the expected ingress interface and can be forwarded out the correct egress interface.\n'
+    ip neigh
+
+    net_header "4. dns"
+    printf 'Comment: the router is the DNS server in this lab, so verify it can answer the name locally.\n'
+    cat /etc/resolv.conf
+    nslookup brain 127.0.0.1 || true
+
+    net_header "5. iptables"
+    printf 'Comment: this is the main decision point for cross-subnet traffic in the lab.\n'
+    iptables -vnL FORWARD
+    iptables -S FORWARD
   }
 
   sniff-brain() {
