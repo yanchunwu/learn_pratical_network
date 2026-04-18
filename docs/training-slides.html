@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Training Lab Slides</title>
+  <style>
+    :root {
+      --bg: #f4efe4;
+      --panel: rgba(255, 252, 245, 0.92);
+      --ink: #17232c;
+      --muted: #4f616d;
+      --green: #237a57;
+      --blue: #24638b;
+      --red: #b42318;
+      --gold: #9a6a00;
+      --line: rgba(23, 35, 44, 0.12);
+      --shadow: 0 24px 80px rgba(32, 44, 56, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(35, 122, 87, 0.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(36, 99, 139, 0.18), transparent 32%),
+        linear-gradient(160deg, #f8f4eb 0%, var(--bg) 55%, #ece7db 100%);
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      border-radius: 999px;
+      pointer-events: none;
+      filter: blur(20px);
+      opacity: 0.45;
+    }
+
+    body::before {
+      width: 260px;
+      height: 260px;
+      left: 4vw;
+      bottom: 6vh;
+      background: rgba(35, 122, 87, 0.16);
+    }
+
+    body::after {
+      width: 320px;
+      height: 320px;
+      right: 3vw;
+      top: 8vh;
+      background: rgba(36, 99, 139, 0.16);
+    }
+
+    #deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 56px 72px 78px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 28px;
+      opacity: 0;
+      transform: translateX(42px) scale(0.985);
+      transition: opacity 260ms ease, transform 260ms ease;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(23, 35, 44, 0.08);
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      backdrop-filter: blur(10px);
+    }
+
+    h1, h2 {
+      margin: 0;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      font-size: clamp(54px, 7vw, 86px);
+      max-width: 10ch;
+    }
+
+    h2 {
+      font-size: clamp(34px, 4vw, 52px);
+    }
+
+    p.lead {
+      margin: 0;
+      font-size: clamp(20px, 2.2vw, 29px);
+      line-height: 1.3;
+      color: var(--muted);
+      max-width: 34ch;
+    }
+
+    .layout-2col {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 28px;
+      min-height: 0;
+    }
+
+    .layout-split {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 28px;
+      min-height: 0;
+    }
+
+    .panel,
+    .hero,
+    .note {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel {
+      padding: 28px 30px;
+    }
+
+    .hero {
+      padding: 34px 38px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .note {
+      padding: 20px 22px;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding-left: 24px;
+      color: var(--ink);
+      line-height: 1.4;
+      font-size: 20px;
+    }
+
+    li + li {
+      margin-top: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .card {
+      padding: 20px 22px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .card h3, .panel h3 {
+      margin: 0 0 12px;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .mini {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .metric:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .metric .name {
+      font-size: 21px;
+      font-weight: 600;
+    }
+
+    .metric .value {
+      font-size: 18px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .code {
+      margin: 0;
+      padding: 18px 20px;
+      border-radius: 22px;
+      background: #162129;
+      color: #eef6fb;
+      font: 500 18px/1.45 "IBM Plex Mono", "SFMono-Regular", monospace;
+      white-space: pre-wrap;
+      overflow: auto;
+    }
+
+    .code strong {
+      color: #9de4c1;
+      font-weight: 700;
+    }
+
+    .image-frame {
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .image-frame img {
+      width: 100%;
+      height: auto;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 18px;
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .status {
+      padding: 18px 20px;
+      border-radius: 20px;
+      color: #fff;
+    }
+
+    .status.green {
+      background: linear-gradient(135deg, #237a57, #2d9c73);
+    }
+
+    .status.blue {
+      background: linear-gradient(135deg, #24638b, #3d86b7);
+    }
+
+    .status.red {
+      background: linear-gradient(135deg, #9b2519, #cf4539);
+    }
+
+    .status h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .status p {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .footer .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .key {
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      font: 600 13px/1 "IBM Plex Mono", monospace;
+      color: var(--ink);
+    }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      height: 6px;
+      width: 100%;
+      background: rgba(23, 35, 44, 0.08);
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+      transition: width 260ms ease;
+    }
+
+    .highlight {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      .slide {
+        padding: 34px 28px 58px;
+      }
+
+      .layout-2col,
+      .layout-split,
+      .grid-2,
+      .status-row {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        max-width: none;
+      }
+
+      .footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media print {
+      html, body {
+        overflow: visible;
+        background: #fff;
+      }
+
+      body::before,
+      body::after,
+      .progress,
+      .footer .controls {
+        display: none;
+      }
+
+      #deck {
+        height: auto;
+      }
+
+      .slide {
+        position: relative;
+        opacity: 1;
+        transform: none;
+        page-break-after: always;
+        min-height: 100vh;
+        pointer-events: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="deck">
+    <section class="slide active">
+      <div class="kicker">Training Deck</div>
+      <div class="hero">
+        <h1>Network Debugging With Docker Compose</h1>
+        <p class="lead">A hands-on lab for interfaces, layer 2 neighbors, routes, gateway behavior, DNS, firewall policy, and packet capture.</p>
+      </div>
+      <div class="footer">
+        <div>`arm_net` = `172.21.0.0/24` | `brain_net` = `172.20.0.0/24`</div>
+        <div class="controls"><span class="key">←</span><span class="key">→</span><span class="key">Space</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Objective</div>
+      <div class="layout-2col">
+        <div class="panel">
+          <h2>What The Team Should Learn</h2>
+          <ul>
+            <li>How to identify interfaces, subnets, and local neighbors.</li>
+            <li>How routing and a dedicated gateway move traffic across subnets.</li>
+            <li>How DNS on the router supports name-based troubleshooting.</li>
+            <li>How firewall policy changes protocol behavior without breaking everything.</li>
+            <li>How to debug systematically with `ip`, `ss`, `ping`, `tcpdump`, `arp-scan`, and `iptables`.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Lab Components</h3>
+          <div class="metric"><div class="name">`left_arm`</div><div class="value">`172.21.0.11`</div></div>
+          <div class="metric"><div class="name">`right_arm`</div><div class="value">`172.21.0.12`</div></div>
+          <div class="metric"><div class="name">`brain`</div><div class="value">`172.20.0.11`</div></div>
+          <div class="metric"><div class="name">`router`</div><div class="value">`172.21.0.254` + `172.20.0.254`</div></div>
+          <div class="metric"><div class="name">App Behavior</div><div class="value">TCP echo on `9000`, rolling UTC log</div></div>
+        </div>
+      </div>
+      <div class="footer">
+        <div>Goal: teach <span class="highlight">why</span> a flow works or fails, not just which command to type.</div>
+        <div>2 / 10</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Topology</div>
+      <div class="layout-split">
+        <div class="image-frame panel">
+          <img src="./topology-slide.svg" alt="Network training topology">
+        </div>
+        <div class="panel">
+          <h2>Two Subnets, One Router</h2>
+          <ul>
+            <li>`left_arm` and `right_arm` share the same layer-2 segment on `arm_net`.</li>
+            <li>`brain` is isolated on `brain_net` and only reachable through the router.</li>
+            <li>The router runs `dnsmasq`, forwards IPv4, and enforces `FORWARD DROP` plus explicit TCP/9000 allow rules.</li>
+            <li>Cross-subnet TCP works. Cross-subnet ICMP does not.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer">
+        <div>The router is the teaching gateway for inter-subnet traffic.</div>
+        <div>3 / 10</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Layer 2</div>
+      <div class="layout-2col">
+        <div class="panel">
+          <h2>First Question: Who Is On My Local Segment?</h2>
+          <pre class="code">docker compose exec left_arm bash
+ifaces
+ip neigh show dev eth0
+arping -I eth0 right_arm
+<strong>l2-neighbors</strong></pre>
+        </div>
+        <div class="panel">
+          <h3>What To Emphasize</h3>
+          <ul>
+            <li>`right_arm` and `router` are L2 neighbors on `arm_net`.</li>
+            <li>`brain` is <span class="highlight">not</span> an L2 neighbor from `left_arm`.</li>
+            <li>`ip neigh` shows the current ARP cache.</li>
+            <li>`arp-scan --interface=eth0 --localnet` actively sweeps the broadcast domain.</li>
+          </ul>
+          <div class="note" style="margin-top:18px;">
+            <p class="mini">Also point out that Docker’s bridge endpoint at `.1` is visible at layer 2 even though your training gateway is `.254`.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div>Start local before blaming routes, DNS, or firewall policy.</div>
+        <div>4 / 10</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Routing</div>
+      <div class="layout-2col">
+        <div class="panel">
+          <h2>Next Question: Where Will The Packet Go?</h2>
+          <pre class="code">docker compose exec left_arm bash
+routes
+ip route get 172.20.0.11
+
+docker compose exec brain bash
+routes
+ip route get 172.21.0.11</pre>
+        </div>
+        <div class="panel">
+          <h3>Expected Routing Logic</h3>
+          <div class="card">
+            <h3>`left_arm` / `right_arm`</h3>
+            <p class="mini">`172.20.0.0/24 via 172.21.0.254`</p>
+          </div>
+          <div class="card" style="margin-top:16px;">
+            <h3>`brain`</h3>
+            <p class="mini">`172.21.0.0/24 via 172.20.0.254`</p>
+          </div>
+          <div class="note" style="margin-top:18px;">
+            <p class="mini">This is the clean handoff between layer 2 and layer 3: `brain` is not on the local segment, so the packet goes to the router.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div>Route lookup answers “which next hop?” before you test the actual application.</div>
+        <div>5 / 10</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">DNS + Reachability</div>
+      <div class="layout-split">
+        <div class="panel">
+          <h2>Names, Then Packets</h2>
+          <pre class="code">docker compose exec left_arm bash
+dns
+nslookup brain
+check-router
+check-brain</pre>
+          <div class="grid-2" style="margin-top:18px;">
+            <div class="card">
+              <h3>Arm-side DNS</h3>
+              <p class="mini">`172.21.0.254`</p>
+            </div>
+            <div class="card">
+              <h3>Brain-side DNS</h3>
+              <p class="mini">`172.20.0.254`</p>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Training Angle</h3>
+          <ul>
+            <li>Show that name resolution is handled by the router, not by Docker’s default embedded DNS.</li>
+            <li>Make the team distinguish “can I resolve the name?” from “can I complete the TCP flow?”</li>
+            <li>`check-brain` intentionally combines resolution, route inspection, and a TCP probe to keep the story coherent.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer">
+        <div>DNS success does not guarantee transport success.</div>
+        <div>6 / 10</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Firewall</div>
+      <div class="status-row">
+        <div class="status green">
+          <h3>Allowed</h3>
+          <p>Cross-subnet TCP to port `9000`</p>
+        </div>
+        <div class="status blue">
+          <h3>Observed</h3>
+          <p>Name resolution and routing both succeed</p>
+        </div>
+        <div class="status red">
+          <h3>Blocked</h3>
+          <p>Cross-subnet ICMP such as `ping brain`</p>
+        </div>
+      </div>
+      <div class="layout-2col">
+        <div class="panel">
+          <h2>Show The Policy</h2>
+          <pre class="code">docker compose exec router bash
+demo-reset
+fw
+iptables -S FORWARD</pre>
+        </div>
+        <div class="panel">
+          <h3>Story To Tell</h3>
+          <ul>
+            <li>Default `FORWARD` policy is `DROP`.</li>
+            <li>Only explicit TCP/9000 rules permit cross-subnet forwarding.</li>
+            <li>Same-subnet traffic like `left_arm -> right_arm` never traverses the router.</li>
+            <li>Reset counters before the demo so the packet counts move in front of the audience.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer">
+        <div>One of the best teaching moments: same route, same DNS, different protocol result.</div>
+        <div>7 / 10</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Packet Capture</div>
+      <div class="layout-2col">
+        <div class="panel">
+          <h2>Let The Audience See The Traffic</h2>
+          <pre class="code">docker compose exec router bash
+sniff-9000
+
+docker compose exec left_arm bash
+sniff-brain
+
+printf "hello\n" | nc brain 9000</pre>
+        </div>
+        <div class="panel">
+          <h3>What Packet Capture Proves</h3>
+          <ul>
+            <li>TCP flows to `brain:9000` actually traverse the router.</li>
+            <li>Layer-2 neighbor discovery stays on the local segment.</li>
+            <li>When `ping brain` fails, the absence of replies is visible as well.</li>
+          </ul>
+          <div class="note" style="margin-top:18px;">
+            <p class="mini">`sniff-brain` is more focused on a node. `sniff-9000` is better on the router when you want to show the path across subnets.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div>If the audience doubts the explanation, show them the packets.</div>
+        <div>8 / 10</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Live Sequence</div>
+      <div class="layout-split">
+        <div class="panel">
+          <h2>Recommended Demo Script</h2>
+          <ol>
+            <li>`demo-reset` on `router`</li>
+            <li>`check-self` on `left_arm`</li>
+            <li>`l2-neighbors` on `left_arm`</li>
+            <li>`check-router` on `left_arm`</li>
+            <li>`ping right_arm`</li>
+            <li>`ping brain`</li>
+            <li>`check-brain`</li>
+            <li>`sniff-9000` on `router` while repeating the TCP probe</li>
+            <li>`iptables -vnL FORWARD` on `router` to close the loop</li>
+          </ol>
+        </div>
+        <div class="panel">
+          <h3>Why This Order Works</h3>
+          <ul>
+            <li>You move from local facts to routed facts.</li>
+            <li>You separate layer 2, layer 3, DNS, transport, and policy.</li>
+            <li>You show both working and failing paths without changing the topology mid-demo.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer">
+        <div>Keep the narrative linear: local segment → route → name → transport → policy.</div>
+        <div>9 / 10</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Takeaways</div>
+      <div class="hero">
+        <h2>What To Remember</h2>
+        <ul>
+          <li>Layer-2 neighbors answer “who is on my segment?”</li>
+          <li>Routes answer “where does the packet go next?”</li>
+          <li>DNS answers “what IP should I try?”</li>
+          <li>Firewall policy answers “which traffic is actually allowed through?”</li>
+          <li>A strong debugging habit is to verify each layer separately and only then connect the full story.</li>
+        </ul>
+      </div>
+      <div class="footer">
+        <div>Files: `compose.yaml`, `README.md`, `docs/topology-*.svg`, `docs/training-slides.html`</div>
+        <div>10 / 10</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="progress"><span id="progress-bar"></span></div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progressBar = document.getElementById('progress-bar');
+    let index = 0;
+
+    function render() {
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      progressBar.style.width = `${((index + 1) / slides.length) * 100}%`;
+      document.title = `(${index + 1}/${slides.length}) Network Training Lab Slides`;
+    }
+
+    function next() {
+      index = Math.min(index + 1, slides.length - 1);
+      render();
+    }
+
+    function prev() {
+      index = Math.max(index - 1, 0);
+      render();
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (['ArrowRight', 'PageDown', ' ', 'j', 'l'].includes(event.key)) {
+        event.preventDefault();
+        next();
+      } else if (['ArrowLeft', 'PageUp', 'Backspace', 'k', 'h'].includes(event.key)) {
+        event.preventDefault();
+        prev();
+      } else if (event.key === 'Home') {
+        index = 0;
+        render();
+      } else if (event.key === 'End') {
+        index = slides.length - 1;
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

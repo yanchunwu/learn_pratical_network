@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Network Training Lab Slide Topology</title>
+  <desc id="desc">Slide-friendly network topology showing left_arm and right_arm on 172.21.0.0/24, brain on 172.20.0.0/24, and router forwarding only TCP port 9000 between the subnets.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f4ec; }
+      .headline { font: 700 42px sans-serif; fill: #16222b; }
+      .subhead { font: 400 23px sans-serif; fill: #485862; }
+      .zone { stroke-width: 4; rx: 32; ry: 32; }
+      .zone-left { fill: #d9efe5; stroke: #2f7c61; }
+      .zone-right { fill: #dbe7f7; stroke: #2d619a; }
+      .host { fill: #ffffff; stroke: #22313a; stroke-width: 3; rx: 18; ry: 18; }
+      .router { fill: #fff3c7; stroke: #8f6400; stroke-width: 4; rx: 22; ry: 22; }
+      .node-title { font: 700 28px sans-serif; fill: #16222b; }
+      .node-line { font: 500 21px sans-serif; fill: #33434d; }
+      .zone-title { font: 700 30px sans-serif; fill: #16222b; }
+      .zone-line { font: 500 22px sans-serif; fill: #33434d; }
+      .callout { font: 700 24px sans-serif; }
+      .small { font: 500 20px sans-serif; }
+      .allowed { stroke: #117a43; stroke-width: 6; fill: none; marker-end: url(#arrow-green); }
+      .blocked { stroke: #b42318; stroke-width: 6; stroke-dasharray: 14 10; fill: none; marker-end: url(#arrow-red); }
+      .link { stroke: #50616d; stroke-width: 5; fill: none; marker-end: url(#arrow-dark); }
+    </style>
+    <marker id="arrow-dark" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto">
+      <path d="M 0 0 L 14 7 L 0 14 z" fill="#50616d"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto">
+      <path d="M 0 0 L 14 7 L 0 14 z" fill="#117a43"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto">
+      <path d="M 0 0 L 14 7 L 0 14 z" fill="#b42318"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="900"/>
+
+  <text class="headline" x="70" y="72">Network Training Lab Topology</text>
+  <text class="subhead" x="70" y="112">Two subnets, one routed gateway, DNS on the router, and firewall-controlled traffic</text>
+
+  <rect class="zone zone-left" x="60" y="165" width="620" height="600"/>
+  <text class="zone-title" x="95" y="215">arm_net</text>
+  <text class="zone-line" x="95" y="248">172.21.0.0/24</text>
+
+  <rect class="zone zone-right" x="920" y="165" width="620" height="600"/>
+  <text class="zone-title" x="955" y="215">brain_net</text>
+  <text class="zone-line" x="955" y="248">172.20.0.0/24</text>
+
+  <rect class="host" x="120" y="310" width="240" height="145"/>
+  <text class="node-title" x="176" y="360">left_arm</text>
+  <text class="node-line" x="155" y="400">172.21.0.11</text>
+  <text class="node-line" x="170" y="432">TCP/9000</text>
+
+  <rect class="host" x="120" y="515" width="240" height="145"/>
+  <text class="node-title" x="165" y="565">right_arm</text>
+  <text class="node-line" x="155" y="605">172.21.0.12</text>
+  <text class="node-line" x="170" y="637">TCP/9000</text>
+
+  <rect class="router" x="620" y="350" width="360" height="220"/>
+  <text class="node-title" x="755" y="400">router</text>
+  <text class="node-line" x="665" y="445">eth0: 172.21.0.254</text>
+  <text class="node-line" x="665" y="478">eth1: 172.20.0.254</text>
+  <text class="node-line" x="700" y="511">DNS + routing + firewall</text>
+
+  <rect class="host" x="1110" y="415" width="240" height="145"/>
+  <text class="node-title" x="1195" y="465">brain</text>
+  <text class="node-line" x="1145" y="505">172.20.0.11</text>
+  <text class="node-line" x="1160" y="537">TCP/9000</text>
+
+  <path class="link" d="M360 382 C470 382, 535 382, 620 418"/>
+  <path class="link" d="M360 585 C470 585, 540 565, 620 505"/>
+  <path class="link" d="M980 460 C1045 460, 1075 460, 1110 488"/>
+
+  <path class="allowed" d="M355 330 C560 220, 840 220, 1110 415"/>
+  <text class="callout" x="560" y="170" fill="#117a43">Allowed</text>
+  <text class="small" x="560" y="202" fill="#117a43">Cross-subnet TCP to port 9000</text>
+
+  <path class="blocked" d="M360 642 C590 760, 860 760, 1110 560"/>
+  <text class="callout" x="560" y="790" fill="#b42318">Blocked</text>
+  <text class="small" x="560" y="822" fill="#b42318">Cross-subnet ICMP such as ping</text>
+
+  <text class="callout" x="102" y="735" fill="#16222b">Static route on arms</text>
+  <text class="small" x="102" y="767" fill="#33434d">172.20.0.0/24 via 172.21.0.254</text>
+
+  <text class="callout" x="1035" y="635" fill="#16222b">Static route on brain</text>
+  <text class="small" x="1035" y="667" fill="#33434d">172.21.0.0/24 via 172.20.0.254</text>
+
+  <text class="small" x="650" y="620" fill="#33434d">Each node writes hostname + UTC timestamp once per second</text>
+  <text class="small" x="690" y="650" fill="#33434d">Only the last 60 seconds remain in /data/states.log</text>
+
+  <text class="small" x="70" y="860" fill="#5a6973">Docker bridge gateway .1 still exists on each subnet. The router container is the teaching gateway for inter-subnet traffic because the nodes install explicit static routes to .254.</text>
+</svg>

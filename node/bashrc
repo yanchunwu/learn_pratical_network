@@ -1,0 +1,84 @@
+if [ -n "${BASH_VERSION:-}" ]; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  fi
+
+  set -o vi
+
+  net_header() {
+    printf '\n== %s ==\n' "$1"
+  }
+
+  check-self() {
+    net_header "hostname"
+    hostname
+    net_header "interfaces"
+    ip -brief addr
+    net_header "routes"
+    ip route
+    net_header "listeners"
+    ss -lntp
+    net_header "dns"
+    cat /etc/resolv.conf
+  }
+
+  check-router() {
+    net_header "router target"
+    printf 'ROUTER_IP=%s\n' "${ROUTER_IP:-unset}"
+    net_header "route to router"
+    if [ -n "${ROUTER_IP:-}" ]; then
+      ip route get "${ROUTER_IP}"
+      net_header "ping router"
+      ping -c 1 "${ROUTER_IP}"
+      net_header "dns served by router"
+      nslookup brain "${ROUTER_IP}"
+    else
+      printf 'ROUTER_IP is not set in this container.\n'
+      return 1
+    fi
+  }
+
+  check-brain() {
+    net_header "resolve brain"
+    nslookup brain
+    net_header "route to brain"
+    ip route get 172.20.0.11
+    net_header "tcp probe to brain:9000"
+    printf 'hello\n' | nc -w 2 brain 9000
+  }
+
+  sniff-brain() {
+    tcpdump -ni eth0 host brain
+  }
+
+  sniff-9000() {
+    tcpdump -ni eth0 tcp port 9000
+  }
+
+  l2-neighbors() {
+    net_header "arp neighbors on eth0"
+    ip neigh show dev eth0
+    net_header "active arp scan on eth0"
+    arp-scan --interface=eth0 --localnet
+  }
+
+  demo-reset() {
+    net_header "demo reset"
+    printf 'No router counters to reset on %s.\n' "$(hostname)"
+    printf 'If you want clean firewall counters, run demo-reset on router.\n'
+    net_header "interfaces"
+    ip -brief addr
+    net_header "routes"
+    ip route
+  }
+
+  export PS1='[\u@\h \W]\$ '
+  alias ll='ls -alF'
+  alias la='ls -A'
+  alias l='ls -CF'
+  alias ifaces='ip -brief addr'
+  alias routes='ip route'
+  alias ports='ss -lntp'
+  alias fw='iptables -vnL'
+  alias dns='cat /etc/resolv.conf'
+fi

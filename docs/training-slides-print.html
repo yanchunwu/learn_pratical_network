@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Training Lab Print Slides</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #16222b;
+      --muted: #50606b;
+      --line: #d8e0e6;
+      --green: #1f7a53;
+      --blue: #2a6790;
+      --red: #b42318;
+      --gold: #8a6300;
+      --panel: #f8fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      line-height: 1.35;
+    }
+
+    body {
+      padding: 0;
+    }
+
+    .slide {
+      min-height: 100vh;
+      padding: 38px 42px 34px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 18px;
+      page-break-after: always;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .kicker {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    h1 {
+      font-size: 42px;
+      max-width: 12ch;
+    }
+
+    h2 {
+      font-size: 30px;
+    }
+
+    h3 {
+      font-size: 20px;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .lead {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 44ch;
+    }
+
+    .layout-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .layout-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      min-height: 0;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 18px;
+      padding: 18px 20px;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding-left: 22px;
+      font-size: 17px;
+    }
+
+    li + li {
+      margin-top: 8px;
+    }
+
+    .code {
+      margin: 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #12202a;
+      color: #eef4f8;
+      font: 500 14px/1.45 "IBM Plex Mono", monospace;
+      white-space: pre-wrap;
+    }
+
+    .code strong {
+      color: #98e0bc;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+      font-size: 16px;
+    }
+
+    .metric:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .label {
+      font-weight: 700;
+    }
+
+    .value {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .callout {
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .callout.green {
+      border-color: rgba(31, 122, 83, 0.32);
+      background: rgba(31, 122, 83, 0.06);
+    }
+
+    .callout.blue {
+      border-color: rgba(42, 103, 144, 0.32);
+      background: rgba(42, 103, 144, 0.06);
+    }
+
+    .callout.red {
+      border-color: rgba(180, 35, 24, 0.28);
+      background: rgba(180, 35, 24, 0.05);
+    }
+
+    .callout h3 {
+      margin-bottom: 8px;
+    }
+
+    .mini {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .image-wrap {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .image-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .highlight {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    @media screen {
+      body {
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+
+      .slide {
+        min-height: auto;
+      }
+    }
+
+    @media print {
+      @page {
+        size: landscape;
+        margin: 0.4in;
+      }
+
+      .slide {
+        min-height: auto;
+        border-bottom: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="slide">
+    <div class="kicker">Print Deck</div>
+    <h1>Network Training Lab</h1>
+    <p class="lead">Print-oriented notes for a Docker Compose networking session covering interfaces, layer 2 neighbors, routes, gateway behavior, DNS, firewall policy, and packet capture.</p>
+    <div class="layout-2col">
+      <div class="panel">
+        <h2>Learning Goals</h2>
+        <ul>
+          <li>Recognize what is local to a subnet versus what must traverse a router.</li>
+          <li>Use the right tool for each layer: `ip neigh`, `arp-scan`, `ip route`, `nslookup`, `ss`, `iptables`, `tcpdump`.</li>
+          <li>Explain why TCP can work while ICMP fails in the same topology.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h2>Current Topology</h2>
+        <div class="metric"><div class="label">`left_arm`</div><div class="value">`172.21.0.11/24`</div></div>
+        <div class="metric"><div class="label">`right_arm`</div><div class="value">`172.21.0.12/24`</div></div>
+        <div class="metric"><div class="label">`brain`</div><div class="value">`172.20.0.11/24`</div></div>
+        <div class="metric"><div class="label">`router`</div><div class="value">`172.21.0.254` and `172.20.0.254`</div></div>
+        <div class="metric"><div class="label">App</div><div class="value">TCP echo on `9000`, rolling UTC log</div></div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>Subnets: `arm_net` = `172.21.0.0/24`, `brain_net` = `172.20.0.0/24`</div>
+      <div>1 / 8</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Topology</div>
+    <h2>Reference Diagram</h2>
+    <div class="layout-2col">
+      <div class="image-wrap">
+        <img src="./topology-speaker.svg" alt="Presenter topology diagram">
+      </div>
+      <div class="panel">
+        <h3>Key Design Choices</h3>
+        <ul>
+          <li>`left_arm` and `right_arm` are on the same L2 segment.</li>
+          <li>`brain` is on a different subnet, so it is reached through a dedicated router.</li>
+          <li>`dnsmasq` runs on the router so all three hosts resolve by name across subnets.</li>
+          <li>The router allows new cross-subnet TCP to port `9000` but drops other forwarded traffic such as ICMP.</li>
+        </ul>
+        <div class="callout blue" style="margin-top:14px;">
+          <h3>Teaching Note</h3>
+          <p class="mini">Docker still has its own bridge endpoint on each subnet at `.1`. In this lab, `.254` is the teaching gateway because the nodes install explicit routes to the router.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>Use this slide to anchor the rest of the debugging story.</div>
+      <div>2 / 8</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Layer 2</div>
+    <h2>Who Is On My Local Segment?</h2>
+    <div class="layout-2col">
+      <div class="panel">
+        <h3>Commands</h3>
+        <pre class="code">docker compose exec left_arm bash
+ifaces
+ip neigh show dev eth0
+arping -I eth0 right_arm
+arping -I eth0 172.21.0.254
+<strong>l2-neighbors</strong></pre>
+      </div>
+      <div class="panel">
+        <h3>Interpretation</h3>
+        <ul>
+          <li>`right_arm` and `router` are layer-2 neighbors on `arm_net`.</li>
+          <li>`brain` is not a layer-2 neighbor because it is on `172.20.0.0/24`.</li>
+          <li>`ip neigh` shows what the kernel currently knows.</li>
+          <li>`arp-scan --interface=eth0 --localnet` actively discovers hosts on the broadcast domain.</li>
+        </ul>
+        <div class="callout green" style="margin-top:14px;">
+          <h3>Expected Neighbors</h3>
+          <p class="mini">`172.21.0.12` (`right_arm`), `172.21.0.254` (`router`), and Docker’s bridge endpoint `172.21.0.1`.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>Resolve local adjacency before looking at routes or firewall state.</div>
+      <div>3 / 8</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Layer 3</div>
+    <h2>Where Will The Packet Go?</h2>
+    <div class="layout-3col">
+      <div class="panel">
+        <h3>`left_arm` / `right_arm`</h3>
+        <pre class="code">routes
+ip route get 172.20.0.11</pre>
+        <p class="mini">Expected route: `172.20.0.0/24 via 172.21.0.254`</p>
+      </div>
+      <div class="panel">
+        <h3>`brain`</h3>
+        <pre class="code">routes
+ip route get 172.21.0.11</pre>
+        <p class="mini">Expected route: `172.21.0.0/24 via 172.20.0.254`</p>
+      </div>
+      <div class="panel">
+        <h3>Teaching Point</h3>
+        <p class="mini">Layer 2 tells you whether the destination is local. The route table tells you which next hop to use when it is not.</p>
+      </div>
+    </div>
+    <div class="footer">
+      <div>Route lookup is the bridge between local neighbor knowledge and end-to-end transport.</div>
+      <div>4 / 8</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">DNS + Transport</div>
+    <h2>Can I Resolve The Name And Open The TCP Session?</h2>
+    <div class="layout-2col">
+      <div class="panel">
+        <h3>Commands</h3>
+        <pre class="code">docker compose exec left_arm bash
+dns
+nslookup brain
+check-router
+check-brain</pre>
+        <div class="callout blue" style="margin-top:14px;">
+          <h3>DNS Servers</h3>
+          <p class="mini">Arm side uses `172.21.0.254`. Brain side uses `172.20.0.254`.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Interpretation</h3>
+        <ul>
+          <li>Successful DNS means the router can answer the name.</li>
+          <li>Successful TCP means the route, gateway, DNS, and firewall policy all line up for port `9000`.</li>
+          <li>Keep the audience aware that name resolution and transport success are separate checks.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer">
+      <div>DNS answers “what IP?”; TCP answers “can I actually talk to it?”</div>
+      <div>5 / 8</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Policy</div>
+    <h2>Why TCP Works While ICMP Fails</h2>
+    <div class="layout-3col">
+      <div class="callout green">
+        <h3>Allowed</h3>
+        <p class="mini">Cross-subnet TCP to port `9000`</p>
+      </div>
+      <div class="callout blue">
+        <h3>Visible</h3>
+        <p class="mini">Same routes and same DNS still apply</p>
+      </div>
+      <div class="callout red">
+        <h3>Blocked</h3>
+        <p class="mini">Cross-subnet ICMP such as `ping brain`</p>
+      </div>
+    </div>
+    <div class="layout-2col" style="margin-top:18px;">
+      <div class="panel">
+        <h3>Commands</h3>
+        <pre class="code">docker compose exec router bash
+demo-reset
+iptables -vnL FORWARD
+iptables -S FORWARD</pre>
+      </div>
+      <div class="panel">
+        <h3>Interpretation</h3>
+        <ul>
+          <li>Default `FORWARD` policy is `DROP`.</li>
+          <li>Explicit rules allow TCP/9000 between `eth0` and `eth1`.</li>
+          <li>Reset counters before the demo so the packet counts move during the session.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer">
+      <div>One topology, two protocols, two different outcomes because of policy.</div>
+      <div>6 / 8</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Packets</div>
+    <h2>Show The Traffic</h2>
+    <div class="layout-2col">
+      <div class="panel">
+        <h3>Packet Capture</h3>
+        <pre class="code">docker compose exec router bash
+sniff-9000
+
+docker compose exec left_arm bash
+sniff-brain
+
+printf "hello\n" | nc brain 9000</pre>
+      </div>
+      <div class="panel">
+        <h3>Suggested Narrative</h3>
+        <ul>
+          <li>Start capture on the router.</li>
+          <li>Generate a TCP probe from `left_arm`.</li>
+          <li>Show the audience that successful cross-subnet TCP visibly traverses the router.</li>
+          <li>Repeat with `ping brain` to show the contrast.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer">
+      <div>If the explanation is challenged, packet capture is the tie-breaker.</div>
+      <div>7 / 8</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Presenter Notes</div>
+    <h2>Recommended Live Sequence</h2>
+    <div class="layout-2col">
+      <div class="panel">
+        <ol>
+          <li>`demo-reset` on `router`</li>
+          <li>`check-self` on `left_arm`</li>
+          <li>`l2-neighbors` on `left_arm`</li>
+          <li>`check-router` on `left_arm`</li>
+          <li>`ping right_arm`</li>
+          <li>`ping brain`</li>
+          <li>`check-brain`</li>
+          <li>`sniff-9000` on `router` while repeating the TCP probe</li>
+          <li>`iptables -vnL FORWARD` on `router`</li>
+        </ol>
+      </div>
+      <div class="panel">
+        <h3>Closing Message</h3>
+        <ul>
+          <li>Local neighbor discovery is not the same as routed reachability.</li>
+          <li>DNS success is not the same as transport success.</li>
+          <li>Routes explain the path; firewall policy explains the outcome.</li>
+          <li>Good debugging isolates each layer before blaming the whole network.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer">
+      <div>Files: `README.md`, `docs/training-slides.html`, `docs/training-slides-print.html`, `docs/topology-*.svg`</div>
+      <div>8 / 8</div>
+    </div>
+  </section>
+</body>
+</html>
